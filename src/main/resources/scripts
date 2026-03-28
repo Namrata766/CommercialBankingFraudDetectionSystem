@@ -1,0 +1,29 @@
+// 1. Switch to (or create) the database
+use fraud_detection_db;
+
+// 2. Define the collections to be created
+const collections = ['wire_payments', 'ach_payments', 'instant_payments'];
+
+collections.forEach(col => {
+    // Check if collection exists, if not, create it
+    if (!db.getCollectionNames().includes(col)) {
+        db.createCollection(col);
+        console.log(`Created collection: ${col}`);
+    } else {
+        console.log(`Collection ${col} already exists.`);
+    }
+
+    // 3. Create Indexes for the POC
+    // Index on paymentId for fast lookups by the AI
+    db[col].createIndex({ "paymentId": 1 }, { unique: true });
+
+    // Index on executionDate for the 30-day anomaly window
+    db[col].createIndex({ "executionDate": 1 });
+
+    // Index on debtor account for history-based scoring
+    db[col].createIndex({ "debtor.accountId": 1 });
+});
+
+// 4. Verification Output
+console.log("Database Setup Complete:");
+printjson(db.getCollectionNames());

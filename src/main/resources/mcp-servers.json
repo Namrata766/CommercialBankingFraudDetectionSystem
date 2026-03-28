@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "C:\\Users\\NAMRATA\\AppData\\Roaming\\npm\\npx.cmd",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "D:\\MyWorkspace\\git\\mcpclient\\mcp"
+      ]
+    }
+  }
+}
