@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,15 +25,18 @@ public class PaymentDocument {
     private String type;
     private String status;
     private Double amount;
-    private String currency; // Added field
+    private String currency;
     private String executionDate;
-    private String eventTimestamp;
+    private Instant eventTimestamp;
     private Party debtor;
     private Party creditor;
-    private String debtorBank;
-    private String creditorBank;
     private String channel;
     private String network;
     private Flags flags;
     private EventDetail event;
+    private String errorCode;
+    private String errorDescription;
+    // Structured Bank Objects for Jurisdictional Risk Analysis
+    private BankInfo debtorBank;
+    private BankInfo creditorBank;
 }
