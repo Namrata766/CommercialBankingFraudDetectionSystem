@@ -1,12 +1,18 @@
 {
   "mcpServers": {
-    "filesystem": {
-      "command": "C:\\Users\\NAMRATA\\AppData\\Roaming\\npm\\npx.cmd",
+    "banking-fraud-engine": {
+      "command": "java",
       "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "D:\\MyWorkspace\\git\\mcpclient\\mcp"
-      ]
+        "-jar",
+        "D:\\MyWorkspace\\CommercialBankingFraudDetectionSystem\\build\\libs\\CommercialBankingFraudDetectionSystem-0.0.1-SNAPSHOT.jar",
+        "--app.db.seed-data=false"
+      ],
+      "env": {
+        "SPRING_PROFILES_ACTIVE": "default",
+        "MONGO_USER": "${MONGO_USER}",
+        "MONGO_PASSWORD": "${MONGO_PASSWORD}",
+        "OPEN_AI_API_KEY": "${OPEN_AI_API_KEY}"
+      }
     }
   }
 }

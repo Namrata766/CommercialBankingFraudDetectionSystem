@@ -3,7 +3,7 @@ spring.application.name: CommercialBankingFraudDetectionSystem
 spring.ai.openai.api-key: ${OPEN_AI_API_KEY}
 spring.data.mongodb.uri: mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0.y1fdo27.mongodb.net/fraud_detection_db?retryWrites=true&w=majority
 app.db.seed-data: true
-spring.ai.mcp.client.stdio.servers-configuration: classpath:mcp-servers.json
+# spring.ai.mcp.client.stdio.servers-configuration: classpath:mcp-servers.json
 
 logging.pattern.console: "%green(%d{yyyy-MM-dd HH:mm:ss}) %blue(%-5level) %red([%thread]) - %msg%n"
 logging.level.org.springframework.ai.chat.client.advisor: DEBUG
