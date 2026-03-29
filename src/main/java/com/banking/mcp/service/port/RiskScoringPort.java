@@ -10,6 +10,7 @@ public interface RiskScoringPort {
             AnomalyScore anomaly,
             RuleExecutionResult rules,
             CounterpartyProfile counterparty,
-            EwsReputationScore ews
+            EwsReputationScore ews,
+            BatchPatternAnalysis pattern
     );
 }

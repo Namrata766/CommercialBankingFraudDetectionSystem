@@ -54,19 +54,21 @@ public class FraudQueryResponse {
     }
 
     // 🔷 Aggregated summary
-    @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @Data
     public static class Summary {
 
         private int totalTransactions;
-        private int highRiskCount;
-        private int mediumRiskCount;
-        private int lowRiskCount;
 
-        private double averageRiskScore;
+        // 🔷 Fix for your current error
+        private double averageRisk;
 
-        private Map<String, Long> railDistribution;
+        // 🔷 Pattern intelligence
+        private List<String> patternFlags;
+
+        // 🔷 Flexible analytical data
+        private Map<String, Object> additionalInsights;
     }
 
     // 🔷 Execution metadata

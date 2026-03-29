@@ -33,6 +33,12 @@ public class LlmExplanationService {
                 1. A concise summary of risk
                 2. Highlight top risky transactions
                 3. Mention key reasons for risk
+                
+                Focus on:
+                - Patterns across transactions
+                - Repeated behaviors
+                - Structured transactions (smurfing)
+                - Batch anomalies
 
                 Data:
                 %s

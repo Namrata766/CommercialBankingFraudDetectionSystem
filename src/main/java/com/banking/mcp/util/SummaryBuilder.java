@@ -1,39 +1,36 @@
 package com.banking.mcp.util;
 
 import com.banking.mcp.mcp.dto.FraudQueryResponse;
+import com.banking.mcp.model.evaluation.BatchPatternAnalysis;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class SummaryBuilder {
 
-    public static FraudQueryResponse.Summary build(List<FraudQueryResponse.FraudResult> results) {
+    public static FraudQueryResponse.Summary build(
+            List<FraudQueryResponse.FraudResult> results,
+            BatchPatternAnalysis pattern
+    ) {
 
-        int total = results.size();
+        FraudQueryResponse.Summary summary = new FraudQueryResponse.Summary();
 
-        long high = results.stream().filter(r -> "HIGH".equals(r.getRiskLevel())).count();
-        long medium = results.stream().filter(r -> "MEDIUM".equals(r.getRiskLevel())).count();
-        long low = results.stream().filter(r -> "LOW".equals(r.getRiskLevel())).count();
+        summary.setTotalTransactions(results.size());
 
-        double avg = results.stream()
+        double avgRisk = results.stream()
                 .mapToDouble(FraudQueryResponse.FraudResult::getRiskScore)
                 .average()
                 .orElse(0);
 
-        Map<String, Long> railDist = results.stream()
-                .collect(Collectors.groupingBy(
-                        FraudQueryResponse.FraudResult::getRail,
-                        Collectors.counting()
-                ));
+        summary.setAverageRisk(avgRisk);
 
-        return new FraudQueryResponse.Summary(
-                total,
-                (int) high,
-                (int) medium,
-                (int) low,
-                avg,
-                railDist
-        );
+        summary.setPatternFlags(pattern.getPatternFlags());
+
+        summary.setAdditionalInsights(Map.of(
+                "avgAmount", pattern.getAvgAmount(),
+                "stdDeviation", pattern.getStdDeviation()
+        ));
+
+        return summary;
     }
 }
