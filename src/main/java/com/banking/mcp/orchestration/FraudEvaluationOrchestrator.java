@@ -4,10 +4,12 @@ import com.banking.mcp.mcp.dto.FraudQueryRequest;
 import com.banking.mcp.mcp.dto.FraudQueryResponse;
 import com.banking.mcp.model.PaymentDocument;
 import com.banking.mcp.model.evaluation.*;
+import com.banking.mcp.service.impl.LlmExplanationService;
 import com.banking.mcp.service.impl.PatternDetectionService;
 import com.banking.mcp.service.port.*;
 import com.banking.mcp.util.FraudResultMapper;
 import com.banking.mcp.util.SummaryBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,6 +29,7 @@ public class FraudEvaluationOrchestrator {
     private final ExternalIntelPort externalService;
     private final RiskScoringPort scoringService;
     private final PatternDetectionService patternService;
+    private final LlmExplanationService explanationService;
 
     public FraudEvaluationOrchestrator(
             TransactionFetchPort fetchService,
@@ -35,7 +38,8 @@ public class FraudEvaluationOrchestrator {
             CounterpartyAnalysisPort counterpartyService,
             ExternalIntelPort externalService,
             RiskScoringPort scoringService,
-            PatternDetectionService patternService
+            PatternDetectionService patternService,
+            LlmExplanationService explanationService
     ) {
         this.fetchService = fetchService;
         this.anomalyService = anomalyService;
@@ -44,14 +48,16 @@ public class FraudEvaluationOrchestrator {
         this.externalService = externalService;
         this.scoringService = scoringService;
         this.patternService = patternService;
+        this.explanationService = explanationService;
     }
 
     /**
      * Entry point for structured fraud evaluation
      */
-    public FraudQueryResponse evaluateStructured(String userQuery) {
+    public String evaluateStructured(String userQuery) throws JsonProcessingException {
         FraudQueryRequest request = parseQuery(userQuery);
-        return execute(request);
+        FraudQueryResponse response = execute(request);
+        return explanationService.generateExplanation(response);
     }
 
     /**

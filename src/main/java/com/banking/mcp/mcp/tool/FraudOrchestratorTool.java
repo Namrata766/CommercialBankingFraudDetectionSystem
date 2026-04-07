@@ -1,8 +1,7 @@
 package com.banking.mcp.mcp.tool;
 
-import com.banking.mcp.mcp.dto.FraudQueryRequest;
-import com.banking.mcp.mcp.dto.FraudQueryResponse;
 import com.banking.mcp.orchestration.FraudEvaluationOrchestrator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +18,7 @@ public class FraudOrchestratorTool {
             name = "fraud_evaluation_orchestrator",
             description = "Evaluates transactions for fraud risk using multiple signals"
     )
-    public FraudQueryResponse evaluate(FraudQueryRequest request) {
-        return orchestrator.execute(request);
+    public String evaluate(String query) throws JsonProcessingException {
+        return orchestrator.evaluateStructured(query);
     }
 }
