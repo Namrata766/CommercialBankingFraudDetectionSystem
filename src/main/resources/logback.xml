@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Log to stderr to avoid corrupting MCP protocol on stdout -->
+    <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="ERROR">
+        <appender-ref ref="STDERR" />
+    </root>
+
+    <!-- Enable debug for MCP -->
+    <logger name="org.springframework.ai.mcp" level="DEBUG" additivity="false">
+        <appender-ref ref="STDERR" />
+    </logger>
+</configuration>

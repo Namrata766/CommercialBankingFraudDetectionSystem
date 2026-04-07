@@ -8,10 +8,9 @@
         "--app.db.seed-data=false"
       ],
       "env": {
-        "SPRING_PROFILES_ACTIVE": "mcp-server",
-        "MONGO_USER": "${MONGO_USER}",
-        "MONGO_PASSWORD": "${MONGO_PASSWORD}",
-        "OPEN_AI_API_KEY": "${OPEN_AI_API_KEY}"
+        "SPRING_PROFILES_ACTIVE": "default",
+        "MONGODB_URI": "${MONGODB_URI}",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
       }
     }
   }

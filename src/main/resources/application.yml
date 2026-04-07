@@ -1,11 +1,12 @@
-
 spring.application.name: CommercialBankingFraudDetectionSystem
-spring.ai.openai.api-key: ${OPEN_AI_API_KEY}
-spring.data.mongodb.uri: mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0.y1fdo27.mongodb.net/fraud_detection_db?retryWrites=true&w=majority
-app.db.seed-data: false
-# spring.ai.mcp.client.stdio.servers-configuration: classpath:mcp-servers.json
+spring.ai.openai.api-key: ${OPENAI_API_KEY}
+spring.data.mongodb.uri: ${MONGODB_URI}
+app.db.seed-data: true
+spring.main.web-application-type: none
+spring.main.banner-mode: off
 
-logging.pattern.console: "%green(%d{yyyy-MM-dd HH:mm:ss}) %blue(%-5level) %red([%thread]) - %msg%n"
-logging.level.org.springframework.ai.chat.client.advisor: DEBUG
-logging.level.org.springframework.ai.mcp: DEBUG
-logging.level.org.springframework.ai.client: DEBUG
+# Disable all logging to keep stdout clean for MCP protocol
+logging.config: classpath:logback.xml
+logging.level.root: OFF
+logging.level.org.springframework: OFF
+logging.level.org.springframework.ai: OFF

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,8 @@ public class LlmExplanationService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ChatClient chatClient;
 
-    public LlmExplanationService(@Qualifier("toolChatClient") @Lazy ChatClient chatClient) {
-        this.chatClient = chatClient;
+    public LlmExplanationService(@Lazy ChatClient toolChatClient) {
+        this.chatClient = toolChatClient;
     }
 
     public String generateExplanation(FraudQueryResponse response) throws JsonProcessingException {
