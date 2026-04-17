@@ -4,6 +4,7 @@ import com.banking.mcp.model.PaymentDocument;
 import com.banking.mcp.model.evaluation.FinalRiskAssessment;
 import com.banking.mcp.mcp.dto.FraudQueryResponse;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class FraudResultMapper {
@@ -34,10 +35,10 @@ public class FraudResultMapper {
         result.setRiskLevel(risk.getRiskLevel());
         result.setReasonCodes(risk.getReasonCodes());
 
-        result.setHighlights(Map.of(
-                "anomalyScore", risk.getAnalyticalSummary().getOrDefault("anomalyScore", 0),
-                "ruleScore", risk.getAnalyticalSummary().getOrDefault("ruleScore", 0)
-        ));
+        Map<String, Object> highlights = new HashMap<>();
+        highlights.put("anomalyScore", risk.getAnalyticalSummary().getOrDefault("anomalyScore", 0));
+        highlights.put("ruleScore", risk.getAnalyticalSummary().getOrDefault("ruleScore", 0));
+        result.setHighlights(highlights);
 
         result.setAnalyticalSummary(risk.getAnalyticalSummary());
 

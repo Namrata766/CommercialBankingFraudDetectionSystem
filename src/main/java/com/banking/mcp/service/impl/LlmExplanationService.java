@@ -1,12 +1,17 @@
 package com.banking.mcp.service.impl;
 
 import com.banking.mcp.mcp.dto.FraudQueryResponse;
+import com.banking.mcp.util.FraudReasonTranslator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -15,69 +20,102 @@ public class LlmExplanationService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ChatClient chatClient;
 
-    public LlmExplanationService(@Lazy ChatClient toolChatClient) {
-        this.chatClient = toolChatClient;
+    public LlmExplanationService(@Qualifier("toolChatClient") @Lazy ChatClient chatClient) {
+        this.chatClient = chatClient;
     }
 
     public String generateExplanation(FraudQueryResponse response) throws JsonProcessingException {
 
-        log.info("Fraud Query Response: {}", objectMapper.writeValueAsString(response));
+        // 🔷 Enrich response with natural language reasons and risk levels
+        enrichResponseWithNaturalLanguageReasons(response);
+
+        log.info("Fraud Query Response (Enriched): {}", objectMapper.writeValueAsString(response));
         String prompt = buildPrompt(response);
         log.info("Generated LLM Prompt: {}", prompt);
 
-        return chatClient.prompt()
+        log.info("Calling OpenAI LLM for explanation...");
+        String result = chatClient.prompt()
                 .user(prompt)
                 .call()
                 .content();
+        log.info("LLM response received, length: {}", result.length());
+
+        return result;
+    }
+
+    /**
+     * Enrich each FraudResult with natural language reasons, risk levels, and next steps
+     */
+    private void enrichResponseWithNaturalLanguageReasons(FraudQueryResponse response) {
+        if (response.getResults() == null) {
+            return;
+        }
+
+        for (FraudQueryResponse.FraudResult result : response.getResults()) {
+            // 🔷 Translate technical signals to natural language
+            List<FraudReasonTranslator.ReasonWithSource> reasons =
+                    FraudReasonTranslator.translateReasons(result);
+
+            List<String> formattedReasons = reasons.stream()
+                    .map(FraudReasonTranslator.ReasonWithSource::formatted)
+                    .toList();
+
+            // 🔷 Ensure highlights map exists
+            if (result.getHighlights() == null) {
+                result.setHighlights(new HashMap<>());
+            }
+
+            // 🔷 Add enriched data
+            result.getHighlights().put("naturalLanguageReasons", formattedReasons);
+            result.getHighlights().put("riskLevelLabel", FraudReasonTranslator.deriveRiskLevelLabel(result.getRiskScore()));
+            result.getHighlights().put("nextSteps", FraudReasonTranslator.getNextSteps(result));
+        }
     }
 
     private String buildPrompt(FraudQueryResponse response) throws JsonProcessingException {
 
         return """
-                You are a banking fraud analyst.
+                You are a banking fraud analyst preparing a structured report for Claude Desktop.
                 
-                Analyze ONLY the fraud detection results provided below.
-                These are actual evaluated transactions.
+                Your output must be clear, concise, and human-readable. Use the data EXACTLY as provided.
                 
-                Do NOT say you lack data.
-                Do NOT ask for additional data.
-                Do NOT provide generic fraud frameworks.
+                STRICT INSTRUCTIONS:
+                ✓ DO use provided natural language reasons and risk levels
+                ✓ DO format each transaction with: ID, Amount, From, To, Rail, Risk Level, Why Flagged, Recommended Review
+                ✓ DO copy naturalLanguageReasons and nextSteps verbatim from the data
+                ✓ DO NOT include scores, percentages, or technical jargon
+                ✓ DO NOT repeat information across sections
+                ✓ DO NOT suggest regulatory actions (SARs, holds, freezes) — these are for human review
+                ✓ DO NOT add sections beyond the template below
                 
-                Provide:
+                FORMAT YOUR RESPONSE EXACTLY AS FOLLOWS:
                 
-                1) Concise summary of risk
-                - Overall risk level
-                - Whether risk is driven by individual transactions or patterns
+                === PORTFOLIO SUMMARY ===
+                Total Transactions Analyzed: [N]
+                Overall Risk Level: [HIGH | MEDIUM | LOW]
+                Transactions Flagged: [X at HIGH, Y at MEDIUM, Z at LOW]
+                Cross-Transaction Patterns: [Yes/No]
                 
-                2) Top risky transactions (ranked by riskScore)
-                - Include transaction ID, amount, parties (masked), and risk score
+                === TRANSACTION DETAILS ===
+                [For each transaction, ordered by risk level (HIGH first)]
                 
-                3) Key reasons for elevated risk
-                Focus on:
-                - Patterns across transactions
-                - Smurfing / structuring behavior
-                - Repeated or linked accounts
-                - Rule triggers and EWS signals
-                - Any notable behavioral patterns
+                **Transaction ID:** [paymentId]
+                **Amount:** $[amount] [currency]
+                **From:** [debtorAccountMasked]
+                **To:** [creditorAccountMasked]
+                **Rail:** [rail]
+                **Risk Level:** [Use riskLevelLabel from highlights]
                 
-                Important:
-                - Use ONLY the provided data
-                - Do NOT generate synthetic examples
-                - Do NOT return JSON
-                - Keep the response concise and readable
-                - Do NOT add extra sections
+                **Why Flagged:**
+                [Copy naturalLanguageReasons list verbatim from highlights]
                 
-                STRICT BEHAVIOR RULES:
+                **Recommended Review:**
+                [Copy nextSteps verbatim from highlights]
                 
-                - Treat the provided data as COMPLETE for analysis
-                - Do NOT mention missing data
-                - Do NOT say data is insufficient
-                - Do NOT ask for more data
-                - Do NOT suggest re-running analysis
-                - Do NOT provide next steps or options
-                - Do NOT act as a consultant
+                ---
                 
-                Your job is ONLY to analyze and summarize the given transactions.
+                === KEY INSIGHTS ===
+                [2-3 bullet points with the most important cross-transaction observations. Do NOT repeat transaction details.]
                 
                 DATA:
                 %s

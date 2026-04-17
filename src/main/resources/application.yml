@@ -1,9 +1,10 @@
 spring.application.name: CommercialBankingFraudDetectionSystem
-spring.ai.openai.api-key: ${OPENAI_API_KEY}
+spring.ai.openai.api-key: ${OPEN_AI_API_KEY}
 spring.data.mongodb.uri: ${MONGODB_URI}
-app.db.seed-data: true
+app.db.seed-data: false
 spring.main.web-application-type: none
 spring.main.banner-mode: off
+spring.profiles.active: default
 
 # Disable all logging to keep stdout clean for MCP protocol
 logging.config: classpath:logback.xml
