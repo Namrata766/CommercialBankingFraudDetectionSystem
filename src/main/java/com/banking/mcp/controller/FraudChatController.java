@@ -1,10 +1,8 @@
 package com.banking.mcp.controller;
 
-import com.banking.mcp.mcp.dto.FraudQueryResponse;
 import com.banking.mcp.orchestration.FraudEvaluationOrchestrator;
 import com.banking.mcp.service.impl.LlmExplanationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
