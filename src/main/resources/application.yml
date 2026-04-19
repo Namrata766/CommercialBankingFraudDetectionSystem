@@ -1,9 +1,16 @@
+server.port: 8081
 spring.application.name: CommercialBankingFraudDetectionSystem
 spring.ai.openai.api-key: ${OPEN_AI_API_KEY}
 spring.ai.openai.chat.options.model: gpt-4o-mini
+spring.ai.mcp.server.type: sync
+spring.ai.mcp.server.annotation-scanner.enabled: true
+spring.ai.mcp.server.protocol: streamable
+spring.ai.mcp.server.streamable-http.keep-alive-interval: 30s
+
 spring.data.mongodb.uri: mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0.y1fdo27.mongodb.net/fraud_detection_db?retryWrites=true&w=majority
 app.db.seed-data: false
 # spring.ai.mcp.client.stdio.servers-configuration: classpath:mcp-servers.json
+app.mcp.security.api-key: ${MCP_API_KEY}
 
 logging.pattern.console: "%green(%d{yyyy-MM-dd HH:mm:ss}) %blue(%level) %red([%thread]) - %msg%n"
 logging.level.org.springframework.ai.chat.client.advisor: DEBUG
